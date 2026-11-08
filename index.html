@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cards Dashboard</title>
+<style>
+  *{ box-sizing: border-box; }
+
+  body{
+    margin: 0;
+    min-height: 100vh;
+    padding: clamp(16px, 2.5vw, 48px);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(135deg,#1e293b,#0f172a);
+    color: #e2e8f0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    font-size: clamp(15px, 1.2vw, 19px);
+  }
+
+  /* ---------- vertical stacked container ---------- */
+  .container{
+    width: 100%;
+    max-width: 1400px;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(14px, 1.6vh, 24px);
+  }
+
+  /* ---------- card base ---------- */
+  .card{
+    position: relative;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: clamp(12px, 0.9vw, 18px);
+    overflow: hidden;
+    box-shadow: 0 10px 26px rgba(0,0,0,.38);
+    transition: border-color .25s;
+  }
+  .card.open{ border-color: #38bdf8; }
+
+  /* ---------- card header ---------- */
+  .card-header{
+    display: flex;
+    align-items: center;
+    gap: clamp(10px, 1vw, 16px);
+    padding: clamp(16px, 1.6vh, 26px) clamp(18px, 1.6vw, 30px);
+    background: #243449;
+    cursor: pointer;
+    user-select: none;
+    transition: background .2s;
+    outline: none;
+  }
+  .card-header:hover{ background: #2b3d55; }
+  .card-header:focus-visible{
+    background: #2b3d55;
+    box-shadow: inset 0 0 0 3px #38bdf8;
+  }
+
+  .card-header .icon{ font-size: clamp(18px, 1.5vw, 24px); }
+  .card-header .title{
+    flex: 1;
+    font-size: clamp(15px, 1.3vw, 20px);
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .card-header .lock{
+    font-size: clamp(13px, 1.1vw, 17px);
+    opacity: 0.85;
+  }
+  .card-header .arrow{
+    font-size: clamp(12px, 1vw, 15px);
+    color: #94a3b8;
+    transition: transform .3s;
+  }
+  .card.open .card-header .arrow{ transform: rotate(180deg); }
+
+  /* locked card: pointer for toast trigger */
+  .card.locked .card-header{
+    cursor: pointer;
+  }
+  .card.locked .card-header:hover{
+    background: #2b3d55;
+  }
+
+  /* ---------- inline toast (expands below header, inside card) ---------- */
+  .toast{
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height .35s ease, opacity .25s ease;
+    background: #0b3a5a;
+    border-top: 0 solid #38bdf8;
+    border-bottom: 0 solid #38bdf8;
+  }
+  .toast.show{
+    max-height: 120px;
+    opacity: 1;
+    border-top: 1px solid #38bdf8;
+    border-bottom: 1px solid #38bdf8;
+  }
+  .toast .toast-inner{
+    padding: clamp(10px, 1.2vh, 16px) clamp(18px, 1.6vw, 30px);
+    color: #e0f2fe;
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: clamp(12px, 1vw, 16px);
+    font-weight: 700;
+    letter-spacing: .6px;
+    text-align: center;
+    word-break: break-all;
+  }
+
+  /* ---------- collapsible panel ---------- */
+  .panel{
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .4s ease;
+  }
+  .card.open .panel{
+    max-height: 5000px;
+    overflow: visible;
+  }
+
+  /* always-open search */
+  .card.always-open .panel{
+    max-height: none;
+    overflow: visible;
+  }
+  .card.always-open .card-header{
+    cursor: default;
+  }
+  .card.always-open .card-header:hover{
+    background: #243449;
+  }
+
+  /* static card (no header, panel always visible) */
+  .card.static .panel{
+    max-height: none;
+    overflow: visible;
+  }
+
+  /* ============================================================
+     ANDROID-TV STYLE APP GRID (Bookmarks)
+     ============================================================ */
+  .apps-grid{
+    display: grid;
+    gap: clamp(12px, 1.4vw, 22px);
+    padding: clamp(14px, 1.6vh, 24px);
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 600px){  .apps-grid{ grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 900px){  .apps-grid{ grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 1200px){ .apps-grid{ grid-template-columns: repeat(5, 1fr); } }
+
+  .app-tile{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(8px, 1vh, 14px);
+    padding: clamp(10px, 1.2vh, 16px);
+    border-radius: clamp(10px, 0.8vw, 16px);
+    background: #0f172a;
+    border: 1px solid transparent;
+    text-decoration: none;
+    color: #e2e8f0;
+    transition: transform .2s, background .2s, border-color .2s, box-shadow .2s;
+    outline: none;
+    cursor: pointer;
+  }
+  .app-tile:hover,
+  .app-tile:focus-visible{
+    background: #0b3a5a;
+    border-color: #38bdf8;
+    transform: translateY(-4px) scale(1.04);
+    box-shadow: 0 10px 22px rgba(56,189,248,.28);
+  }
+
+  .app-icon{
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: clamp(10px, 0.8vw, 16px);
+    background: #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 14%;
+  }
+  .app-icon img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    image-rendering: -webkit-optimize-contrast;
+  }
+  .app-initial{
+    font-size: clamp(28px, 2.6vw, 44px);
+    font-weight: 800;
+    color: #7dd3fc;
+    font-family: system-ui, sans-serif;
+    letter-spacing: 1px;
+  }
+
+  .app-name{
+    font-size: clamp(12px, 1vw, 15px);
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    letter-spacing: .3px;
+  }
+
+  /* ---------- a.js text rows ---------- */
+  .text-list{
+    padding: clamp(10px, 1vw, 18px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(9px, 1vh, 14px);
+  }
+  .text-row{
+    background: #0f172a;
+    border: 1px solid #1e3a5f;
+    border-radius: clamp(9px, 0.7vw, 12px);
+    padding: clamp(10px, 1.2vh, 16px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(9px, 1vh, 14px);
+  }
+  .text-row .txt{
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: clamp(13px, 1.1vw, 17px);
+    line-height: 1.5;
+    color: #cbd5e1;
+    word-break: break-all;
+  }
+  .text-row .txt.url{ color: #7dd3fc; }
+  .text-actions{ display: flex; gap: clamp(8px, 0.7vw, 12px); flex-wrap: wrap; }
+
+  .btn{
+    font: inherit;
+    font-size: clamp(12px, 1vw, 15px);
+    padding: clamp(7px, 0.9vh, 12px) clamp(14px, 1.2vw, 20px);
+    border-radius: clamp(7px, 0.5vw, 9px);
+    border: 1px solid #334155;
+    background: #1e293b;
+    color: #cbd5e1;
+    cursor: pointer;
+    text-decoration: none;
+    transition: .2s;
+    outline: none;
+  }
+  .btn:hover,
+  .btn:focus-visible{
+    background: #0b3a5a;
+    border-color: #38bdf8;
+    color: #fff;
+  }
+  .btn.go{ background: #0369a1; border-color: #0284c7; color: #fff; font-weight: 600; }
+  .btn.go:hover,
+  .btn.go:focus-visible{ background: #0284c7; }
+  .btn.done{ background: #15803d; border-color: #22c55e; color: #fff; }
+
+  /* ---------- search ---------- */
+  .search-box{
+    padding: clamp(12px, 1.4vh, 20px) clamp(12px, 1.2vw, 20px) clamp(6px, 0.8vh, 10px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1vh, 14px);
+    width: 100%;
+  }
+  .search-box input{
+    width: 100%;
+    padding: clamp(12px, 1.3vh, 20px) clamp(14px, 1.3vw, 22px);
+    border-radius: clamp(8px, 0.7vw, 12px);
+    border: 1px solid #334155;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-size: clamp(15px, 1.3vw, 20px);
+    outline: none;
+    transition: .2s;
+  }
+  .search-box input:focus{
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(56,189,248,.22);
+  }
+  .search-box button{
+    width: 100%;
+    padding: clamp(12px, 1.3vh, 20px) clamp(16px, 1.4vw, 24px);
+    border: none;
+    border-radius: clamp(8px, 0.7vw, 12px);
+    background: #0284c7;
+    color: #fff;
+    font-size: clamp(15px, 1.3vw, 20px);
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s;
+    outline: none;
+  }
+  .search-box button:hover,
+  .search-box button:focus-visible{
+    background: #0ea5e9;
+    box-shadow: 0 0 0 3px rgba(56,189,248,.35);
+  }
+
+  /* suggestions */
+  .suggestions{
+    display: none;
+    padding: 0 clamp(12px, 1.2vw, 20px) clamp(6px, 0.8vh, 10px);
+    flex-direction: column;
+    gap: clamp(5px, 0.7vh, 10px);
+  }
+  .suggestions.show{ display: flex; }
+  .suggestions .sug{
+    padding: clamp(10px, 1.1vh, 16px) clamp(14px, 1.2vw, 20px);
+    background: #0f172a;
+    border: 1px solid #1e3a5f;
+    border-radius: clamp(7px, 0.6vw, 10px);
+    color: #cbd5e1;
+    cursor: pointer;
+    font-size: clamp(14px, 1.2vw, 18px);
+    transition: .2s;
+    outline: none;
+  }
+  .suggestions .sug:hover,
+  .suggestions .sug:focus-visible{
+    background: #0b3a5a;
+    border-color: #38bdf8;
+    color: #fff;
+  }
+  .suggestions .sug b{ color: #7dd3fc; }
+
+  /* results */
+  .search-results{
+    padding: clamp(6px, 0.8vh, 10px) clamp(12px, 1.2vw, 20px) clamp(12px, 1.4vh, 20px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(6px, 0.8vh, 10px);
+  }
+  .search-results a{
+    display: block;
+    padding: clamp(10px, 1.1vh, 16px) clamp(14px, 1.2vw, 20px);
+    background: #0f172a;
+    border: 1px solid #1e3a5f;
+    border-radius: clamp(8px, 0.7vw, 11px);
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: clamp(14px, 1.2vw, 18px);
+    transition: .2s;
+    outline: none;
+  }
+  .search-results a:hover,
+  .search-results a:focus-visible{
+    background: #0b3a5a;
+    border-color: #38bdf8;
+    color: #fff;
+  }
+  .search-results a b{ color: #7dd3fc; }
+  .search-results .empty{
+    color: #94a3b8;
+    font-size: clamp(13px, 1.1vw, 17px);
+    padding: clamp(8px, 1vh, 14px) 2px;
+    text-align: center;
+  }
+
+  /* TV / large desktop boost */
+  @media (min-width: 1400px) {
+    body { font-size: 20px; }
+    .container { max-width: 1600px; }
+  }
+  @media (min-width: 1920px) {
+    body { font-size: 22px; }
+    .container { max-width: 1800px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ================= CARD 1 : SEARCH (top, always open) ================= -->
+  <section class="card always-open">
+    <div class="card-header">
+      <span class="icon">🔍</span>
+      <span class="title">SEARCH</span>
+    </div>
+    <div class="panel">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search BOOKMARKS.." autocomplete="off">
+        <button id="searchBtn">Go</button>
+      </div>
+      <div class="suggestions" id="suggestions"></div>
+      <div class="search-results" id="searchResults">
+        <div class="empty">Type a bookmark name to search</div>
+      </div>
+    </div>
+  </section>
+ <!-- ================= CARD 3 : a.js TEXT BOX (locked, click → inline toast) ================= -->
+  <section class="card locked" id="aJsCard">
+    <div class="card-header" id="aJsHeader" tabindex="0">
+      <span class="icon">📄</span>
+      <span class="title">a.js — TEXT BOX</span>
+      <span class="lock">🔒</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="toast" id="aJsToast">
+      <div class="toast-inner">ADMIN&gt;PROTON PASS&gt;SEARCH&gt;TV9053</div>
+    </div>
+    <div class="panel">
+      <div class="text-list" id="textList"></div>
+    </div>
+  </section>
+  <!-- ================= CARD 2 : BOOKMARKS (TV-style app grid, static) ================= -->
+  <section class="card static">
+    <div class="panel">
+      <div class="apps-grid" id="appsGrid"></div>
+    </div>
+  </section>
+
+ 
+
+</div>
+
+<script src="a.js"></script>
+<script src="b.js"></script>
+
+<script>
+/* ============ a.js LOCK STATE + INLINE TOAST ============ */
+var aJsCard   = document.getElementById('aJsCard');
+var aJsHeader = document.getElementById('aJsHeader');
+var aJsToast  = document.getElementById('aJsToast');
+var aJsLocked = true;
+var toastTimer = null;
+
+function showAjsToast() {
+  if (toastTimer) clearTimeout(toastTimer);
+  aJsToast.classList.add('show');
+  toastTimer = setTimeout(function () {
+    aJsToast.classList.remove('show');
+    toastTimer = null;
+  }, 3000);
+}
+
+function unlockAjs() {
+  if (!aJsLocked) {
+    aJsCard.classList.add('open');
+    return;
+  }
+  aJsLocked = false;
+  aJsCard.classList.remove('locked');
+  aJsCard.classList.add('open');
+  aJsHeader.innerHTML =
+    '<span class="icon">📄</span>' +
+    '<span class="title">a.js — TEXT BOX</span>' +
+    '<span class="arrow">▼</span>';
+}
+
+aJsHeader.addEventListener('click', function () {
+  if (!aJsLocked) return;
+  showAjsToast();
+});
+aJsHeader.addEventListener('keydown', function (e) {
+  if (!aJsLocked) return;
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    showAjsToast();
+  }
+});
+
+/* ============ OTHER CARD EXPAND / COLLAPSE ============ */
+document.querySelectorAll('.card-header').forEach(function(header){
+  if (header.parentElement.classList.contains('always-open')) return;
+  if (header.parentElement.classList.contains('static')) return;
+  if (header.parentElement.classList.contains('locked')) return;
+
+  header.addEventListener('click', function(){
+    header.parentElement.classList.toggle('open');
+  });
+
+  header.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      header.click();
+    }
+  });
+});
+
+/* ============ BOOKMARKS → from b.js ============ */
+var bookmarks = (typeof bData !== 'undefined' && bData && Array.isArray(bData.bookmarks))
+                ? bData.bookmarks
+                : [];
+
+var appsGrid = document.getElementById('appsGrid');
+
+function getDomain(url) {
+  try { return new URL(url).hostname; } catch (e) { return ''; }
+}
+
+if (!bookmarks.length) {
+  appsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#94a3b8;padding:20px;">' +
+                       'b.js லோட் ஆகவில்லை அல்லது bookmarks காலியாக உள்ளது.' +
+                       '</div>';
+}
+
+bookmarks.forEach(function (item) {
+  var domain  = getDomain(item.url);
+  var favicon = 'https://www.google.com/s2/favicons?sz=128&domain=' + encodeURIComponent(domain);
+
+  var a = document.createElement('a');
+  a.className = 'app-tile';
+  a.href      = item.url;
+  a.target    = '_blank';
+  a.rel       = 'noopener noreferrer';
+  a.tabIndex  = 0;
+  a.title     = item.name;
+
+  var iconWrap = document.createElement('div');
+  iconWrap.className = 'app-icon';
+
+  var img = document.createElement('img');
+  img.src     = favicon;
+  img.alt     = item.name;
+  img.loading = 'lazy';
+  img.addEventListener('error', function () {
+    iconWrap.innerHTML = '<span class="app-initial">' +
+      item.name.charAt(0).toUpperCase() + '</span>';
+  });
+  iconWrap.appendChild(img);
+
+  var nameEl = document.createElement('div');
+  nameEl.className   = 'app-name';
+  nameEl.textContent = item.name;
+
+  a.appendChild(iconWrap);
+  a.appendChild(nameEl);
+  appsGrid.appendChild(a);
+});
+
+/* ============ a.js TEXTS ============ */
+function isURL(str){
+  try { var u = new URL(str); return u.protocol === 'http:' || u.protocol === 'https:'; }
+  catch(e){ return false; }
+}
+
+function copyText(text, btn){
+  var done = function(ok){
+    var old = btn.getAttribute('data-label') || btn.textContent;
+    btn.setAttribute('data-label', old);
+    btn.textContent = ok ? 'Copied ✓' : 'Failed';
+    btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1400);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(function(){ done(true); })
+      .catch(function(){ fallbackCopy(text, done); });
+  } else fallbackCopy(text, done);
+}
+
+function fallbackCopy(text, done){
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  var ok = false;
+  try { ok = document.execCommand('copy'); } catch(e){ ok = false; }
+  document.body.removeChild(ta);
+  done(ok);
+}
+
+var aTexts = (typeof aData !== 'undefined' && aData && Array.isArray(aData.texts)) ? aData.texts : [];
+var textList = document.getElementById('textList');
+
+if (!aTexts.length) {
+  textList.innerHTML = '<div class="text-row"><div class="txt">a.js லோட் ஆகவில்லை அல்லது texts காலியாக உள்ளது.</div></div>';
+}
+
+aTexts.forEach(function(txt){
+  var row = document.createElement('div');
+  row.className = 'text-row';
+
+  var content = document.createElement('div');
+  content.className = 'txt' + (isURL(txt) ? ' url' : '');
+  content.textContent = txt;
+  row.appendChild(content);
+
+  var actions = document.createElement('div');
+  actions.className = 'text-actions';
+
+  var copyBtn = document.createElement('button');
+  copyBtn.type = 'button';
+  copyBtn.className = 'btn';
+  copyBtn.textContent = 'Copy';
+  copyBtn.addEventListener('click', function(){ copyText(txt, copyBtn); });
+  actions.appendChild(copyBtn);
+
+  if (isURL(txt)) {
+    var go = document.createElement('a');
+    go.className = 'btn go';
+    go.href = txt;
+    go.target = '_blank';
+    go.rel = 'noopener noreferrer';
+    go.textContent = 'Go ↗';
+    actions.appendChild(go);
+  }
+
+  row.appendChild(actions);
+  textList.appendChild(row);
+});
+
+/* ============ SEARCH ============ */
+var searchInput   = document.getElementById('searchInput');
+var searchBtn     = document.getElementById('searchBtn');
+var suggestionsEl = document.getElementById('suggestions');
+var resultsEl     = document.getElementById('searchResults');
+
+function getMatches(q){
+  var key = q.trim().toLowerCase();
+  if (!key) return [];
+  return bookmarks.filter(function(b){ return b.name.toLowerCase().indexOf(key) !== -1; });
+}
+
+function highlight(name, q){
+  var key = q.trim();
+  if (!key) return name;
+  var idx = name.toLowerCase().indexOf(key.toLowerCase());
+  if (idx === -1) return name;
+  return name.slice(0, idx) + '<b>' + name.slice(idx, idx + key.length) + '</b>' + name.slice(idx + key.length);
+}
+
+function showSuggestions(){
+  var q = searchInput.value;
+  var matches = getMatches(q);
+  suggestionsEl.innerHTML = '';
+  if (!q.trim() || matches.length === 0) {
+    suggestionsEl.classList.remove('show');
+    return;
+  }
+  matches.slice(0, 6).forEach(function(b){
+    var div = document.createElement('div');
+    div.className = 'sug';
+    div.innerHTML = highlight(b.name, q);
+    div.tabIndex = 0;
+    div.addEventListener('click', function(){
+      searchInput.value = b.name;
+      suggestionsEl.classList.remove('show');
+      window.open(b.url, '_blank', 'noopener');
+    });
+    div.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') div.click();
+    });
+    suggestionsEl.appendChild(div);
+  });
+  suggestionsEl.classList.add('show');
+}
+
+function showResults(){
+  var q = searchInput.value.trim();
+  resultsEl.innerHTML = '';
+  suggestionsEl.classList.remove('show');
+  if (!q) {
+    resultsEl.innerHTML = '<div class="empty">Type a bookmark name to search</div>';
+    return;
+  }
+
+  var isCode = /^\d{4}$/.test(q);
+  if (isCode) {
+    unlockAjs();
+  }
+
+  var matches = getMatches(q);
+
+  if (matches.length === 0) {
+    if (isCode) resultsEl.innerHTML = '<div class="empty">a.js Text Box unlocked &amp; expanded ✓</div>';
+    else resultsEl.innerHTML = '<div class="empty">No bookmarks found for "' + q + '"</div>';
+    return;
+  }
+
+  matches.forEach(function(b){
+    var a = document.createElement('a');
+    a.href = b.url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.innerHTML = highlight(b.name, q);
+    resultsEl.appendChild(a);
+  });
+
+  if (isCode) {
+    var note = document.createElement('div');
+    note.className = 'empty';
+    note.innerHTML = 'a.js Text Box unlocked &amp; expanded ✓';
+    resultsEl.appendChild(note);
+  }
+}
+
+searchInput.addEventListener('input', showSuggestions);
+searchInput.addEventListener('keydown', function(e){
+  if (e.key === 'Enter') showResults();
+});
+searchBtn.addEventListener('click', showResults);
+
+document.addEventListener('click', function(e){
+  if (!e.target.closest('.search-box') && !e.target.closest('.suggestions')) {
+    suggestionsEl.classList.remove('show');
+  }
+});
+</script>
+
+</body>
+</html>
