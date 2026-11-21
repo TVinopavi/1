@@ -1,11 +1,10 @@
 var aData = {
   texts: [
-    
+    "https://disk.yandex.com/d/r-DWDdHO02lH6Q",
     "https://www.google.com",
     "https://mail.google.com",
-    "https://github.com",
-    "OpenAI ChatGPT",
-    "best Tamil movies 2024",
-    "https://developer.mozilla.org"
+    "https://www.youtube.com",
+    "https://www.wikipedia.org",
+    "https://github.com"
   ]
 };
