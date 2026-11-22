@@ -515,7 +515,7 @@ bookmarks.forEach(function (item) {
   var a = document.createElement('a');
   a.className = 'app-tile';
   a.href      = item.url;
-  a.target    = '_blank';
+  /* Android TV: same-tab navigation (target=_blank removed) */
   a.rel       = 'noopener noreferrer';
   a.tabIndex  = 0;
   a.title     = item.name;
@@ -606,7 +606,7 @@ aTexts.forEach(function(txt){
     var go = document.createElement('a');
     go.className = 'btn go';
     go.href = txt;
-    go.target = '_blank';
+    /* Android TV: same-tab navigation */
     go.rel = 'noopener noreferrer';
     go.textContent = 'Go ↗';
     actions.appendChild(go);
@@ -652,7 +652,8 @@ function showSuggestions(){
     div.addEventListener('click', function(){
       searchInput.value = b.name;
       suggestionsEl.classList.remove('show');
-      window.open(b.url, '_blank', 'noopener');
+      /* Android TV: same-tab navigation */
+      window.location.href = b.url;
     });
     div.addEventListener('keydown', function(e){
       if (e.key === 'Enter') div.click();
@@ -687,7 +688,7 @@ function showResults(){
   matches.forEach(function(b){
     var a = document.createElement('a');
     a.href = b.url;
-    a.target = '_blank';
+    /* Android TV: same-tab navigation */
     a.rel = 'noopener noreferrer';
     a.innerHTML = highlight(b.name, q);
     resultsEl.appendChild(a);
