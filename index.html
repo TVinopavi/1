@@ -6,27 +6,46 @@
 <title>Cards Dashboard</title>
 <style>
   *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
 
   body{
     margin: 0;
     min-height: 100vh;
-    padding: clamp(16px, 2.5vw, 48px);
+    padding: clamp(24px, 3vw, 64px);
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     background: linear-gradient(135deg,#1e293b,#0f172a);
+    background-attachment: fixed;
     color: #e2e8f0;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    font-size: clamp(15px, 1.2vw, 19px);
+    font-size: clamp(18px, 1.4vw, 26px);
+    line-height: 1.45;
   }
 
-  /* ---------- vertical stacked container ---------- */
+  /* ---------- TV FOCUS SYSTEM ---------- */
+  *:focus{ outline: none; }
+
+  .card-header:focus,
+  .app-tile:focus,
+  .btn:focus,
+  .sug:focus,
+  .search-results a:focus,
+  .search-box button:focus,
+  .search-box input:focus{
+    outline: 4px solid #38bdf8;
+    outline-offset: -4px;
+    box-shadow: 0 0 28px rgba(56,189,248,.55),
+                0 0 60px rgba(56,189,248,.25);
+    position: relative;
+    z-index: 3;
+  }
+
+  /* ---------- vertical stacked container (full width on TV) ---------- */
   .container{
     width: 100%;
-    max-width: 1400px;
+    max-width: 2400px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: clamp(14px, 1.6vh, 24px);
+    gap: clamp(20px, 2.2vh, 36px);
   }
 
   /* ---------- card base ---------- */
@@ -34,35 +53,33 @@
     position: relative;
     background: #1e293b;
     border: 1px solid #334155;
-    border-radius: clamp(12px, 0.9vw, 18px);
+    border-radius: clamp(14px, 1vw, 22px);
     overflow: hidden;
-    box-shadow: 0 10px 26px rgba(0,0,0,.38);
+    box-shadow: 0 12px 32px rgba(0,0,0,.4);
     transition: border-color .25s;
   }
   .card.open{ border-color: #38bdf8; }
 
-  /* ---------- card header ---------- */
+  /* ---------- card header (BIG for TV) ---------- */
   .card-header{
     display: flex;
     align-items: center;
-    gap: clamp(10px, 1vw, 16px);
-    padding: clamp(16px, 1.6vh, 26px) clamp(18px, 1.6vw, 30px);
+    gap: clamp(16px, 1.6vw, 28px);
+    padding: clamp(22px, 2.6vh, 40px) clamp(24px, 2.2vw, 44px);
     background: #243449;
     cursor: pointer;
     user-select: none;
     transition: background .2s;
     outline: none;
+    min-height: clamp(76px, 12vh, 120px);
   }
   .card-header:hover{ background: #2b3d55; }
-  .card-header:focus-visible{
-    background: #2b3d55;
-    box-shadow: inset 0 0 0 3px #38bdf8;
-  }
+  .card-header:focus{ background: #2b3d55; }
 
-  .card-header .icon{ font-size: clamp(18px, 1.5vw, 24px); }
+  .card-header .icon{ font-size: clamp(22px, 2vw, 36px); }
   .card-header .title{
     flex: 1;
-    font-size: clamp(15px, 1.3vw, 20px);
+    font-size: clamp(20px, 1.7vw, 30px);
     font-weight: 700;
     letter-spacing: 1.2px;
     white-space: nowrap;
@@ -70,47 +87,37 @@
     text-overflow: ellipsis;
   }
   .card-header .lock{
-    font-size: clamp(13px, 1.1vw, 17px);
-    opacity: 0.85;
+    font-size: clamp(18px, 1.5vw, 26px);
+    opacity: 0.9;
   }
   .card-header .arrow{
-    font-size: clamp(12px, 1vw, 15px);
+    font-size: clamp(16px, 1.3vw, 22px);
     color: #94a3b8;
     transition: transform .3s;
   }
   .card.open .card-header .arrow{ transform: rotate(180deg); }
 
-  /* locked card: pointer for toast trigger */
-  .card.locked .card-header{
-    cursor: pointer;
-  }
-  .card.locked .card-header:hover{
-    background: #2b3d55;
-  }
-
-  /* ---------- inline toast (expands below header, inside card) ---------- */
+  /* ---------- inline toast ---------- */
   .toast{
     max-height: 0;
     overflow: hidden;
     opacity: 0;
     transition: max-height .35s ease, opacity .25s ease;
     background: #0b3a5a;
-    border-top: 0 solid #38bdf8;
-    border-bottom: 0 solid #38bdf8;
   }
   .toast.show{
-    max-height: 120px;
+    max-height: 160px;
     opacity: 1;
-    border-top: 1px solid #38bdf8;
-    border-bottom: 1px solid #38bdf8;
+    border-top: 2px solid #38bdf8;
+    border-bottom: 2px solid #38bdf8;
   }
   .toast .toast-inner{
-    padding: clamp(10px, 1.2vh, 16px) clamp(18px, 1.6vw, 30px);
+    padding: clamp(16px, 2vh, 28px) clamp(24px, 2.2vw, 44px);
     color: #e0f2fe;
     font-family: ui-monospace, Consolas, monospace;
-    font-size: clamp(12px, 1vw, 16px);
+    font-size: clamp(15px, 1.3vw, 22px);
     font-weight: 700;
-    letter-spacing: .6px;
+    letter-spacing: .8px;
     text-align: center;
     word-break: break-all;
   }
@@ -122,68 +129,63 @@
     transition: max-height .4s ease;
   }
   .card.open .panel{
-    max-height: 5000px;
+    max-height: 8000px;
     overflow: visible;
   }
-
-  /* always-open search */
-  .card.always-open .panel{
-    max-height: none;
-    overflow: visible;
-  }
-  .card.always-open .card-header{
-    cursor: default;
-  }
-  .card.always-open .card-header:hover{
-    background: #243449;
-  }
-
-  /* static card (no header, panel always visible) */
+  .card.always-open .panel,
   .card.static .panel{
     max-height: none;
     overflow: visible;
   }
+  .card.always-open .card-header,
+  .card.always-open .card-header:hover{
+    background: #243449;
+    cursor: default;
+  }
 
   /* ============================================================
-     ANDROID-TV STYLE APP GRID (Bookmarks)
+     ANDROID-TV APP GRID
      ============================================================ */
   .apps-grid{
     display: grid;
-    gap: clamp(12px, 1.4vw, 22px);
-    padding: clamp(14px, 1.6vh, 24px);
+    gap: clamp(16px, 1.8vw, 32px);
+    padding: clamp(20px, 2.4vh, 40px);
     grid-template-columns: repeat(2, 1fr);
   }
   @media (min-width: 600px){  .apps-grid{ grid-template-columns: repeat(3, 1fr); } }
   @media (min-width: 900px){  .apps-grid{ grid-template-columns: repeat(4, 1fr); } }
-  @media (min-width: 1200px){ .apps-grid{ grid-template-columns: repeat(5, 1fr); } }
+  @media (min-width: 1280px){ .apps-grid{ grid-template-columns: repeat(5, 1fr); } }
+  @media (min-width: 1800px){ .apps-grid{ grid-template-columns: repeat(6, 1fr); } }
 
   .app-tile{
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: clamp(8px, 1vh, 14px);
-    padding: clamp(10px, 1.2vh, 16px);
-    border-radius: clamp(10px, 0.8vw, 16px);
+    gap: clamp(12px, 1.6vh, 20px);
+    padding: clamp(18px, 2.2vh, 32px);
+    border-radius: clamp(12px, 1vw, 20px);
     background: #0f172a;
-    border: 1px solid transparent;
+    border: 2px solid transparent;
     text-decoration: none;
     color: #e2e8f0;
     transition: transform .2s, background .2s, border-color .2s, box-shadow .2s;
     outline: none;
     cursor: pointer;
+    min-height: clamp(150px, 20vh, 240px);
+    scroll-margin: 80px;
   }
   .app-tile:hover,
-  .app-tile:focus-visible{
+  .app-tile:focus{
     background: #0b3a5a;
     border-color: #38bdf8;
-    transform: translateY(-4px) scale(1.04);
-    box-shadow: 0 10px 22px rgba(56,189,248,.28);
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 14px 34px rgba(56,189,248,.35);
   }
 
   .app-icon{
     width: 100%;
     aspect-ratio: 1 / 1;
-    border-radius: clamp(10px, 0.8vw, 16px);
+    border-radius: clamp(12px, 1vw, 20px);
     background: #1e293b;
     display: flex;
     align-items: center;
@@ -196,18 +198,16 @@
     height: 100%;
     object-fit: contain;
     display: block;
-    image-rendering: -webkit-optimize-contrast;
   }
   .app-initial{
-    font-size: clamp(28px, 2.6vw, 44px);
+    font-size: clamp(36px, 3.4vw, 64px);
     font-weight: 800;
     color: #7dd3fc;
-    font-family: system-ui, sans-serif;
     letter-spacing: 1px;
   }
 
   .app-name{
-    font-size: clamp(12px, 1vw, 15px);
+    font-size: clamp(14px, 1.15vw, 20px);
     font-weight: 600;
     text-align: center;
     white-space: nowrap;
@@ -219,164 +219,209 @@
 
   /* ---------- a.js text rows ---------- */
   .text-list{
-    padding: clamp(10px, 1vw, 18px);
+    padding: clamp(16px, 1.8vh, 28px);
     display: flex;
     flex-direction: column;
-    gap: clamp(9px, 1vh, 14px);
+    gap: clamp(14px, 1.6vh, 24px);
   }
   .text-row{
     background: #0f172a;
     border: 1px solid #1e3a5f;
-    border-radius: clamp(9px, 0.7vw, 12px);
-    padding: clamp(10px, 1.2vh, 16px);
+    border-radius: clamp(10px, 0.8vw, 16px);
+    padding: clamp(16px, 2vh, 28px);
     display: flex;
     flex-direction: column;
-    gap: clamp(9px, 1vh, 14px);
+    gap: clamp(12px, 1.4vh, 20px);
   }
   .text-row .txt{
     font-family: ui-monospace, Consolas, monospace;
-    font-size: clamp(13px, 1.1vw, 17px);
-    line-height: 1.5;
+    font-size: clamp(14px, 1.2vw, 20px);
+    line-height: 1.55;
     color: #cbd5e1;
     word-break: break-all;
   }
   .text-row .txt.url{ color: #7dd3fc; }
-  .text-actions{ display: flex; gap: clamp(8px, 0.7vw, 12px); flex-wrap: wrap; }
+  .text-actions{
+    display: flex;
+    gap: clamp(12px, 1.2vw, 20px);
+    flex-wrap: wrap;
+  }
 
+  /* ---------- buttons (BIG for TV remote) ---------- */
   .btn{
     font: inherit;
-    font-size: clamp(12px, 1vw, 15px);
-    padding: clamp(7px, 0.9vh, 12px) clamp(14px, 1.2vw, 20px);
-    border-radius: clamp(7px, 0.5vw, 9px);
-    border: 1px solid #334155;
+    font-size: clamp(15px, 1.2vw, 20px);
+    font-weight: 600;
+    padding: clamp(14px, 1.8vh, 24px) clamp(24px, 2.2vw, 40px);
+    border-radius: clamp(8px, 0.6vw, 12px);
+    border: 2px solid #334155;
     background: #1e293b;
     color: #cbd5e1;
     cursor: pointer;
     text-decoration: none;
     transition: .2s;
     outline: none;
+    min-height: clamp(52px, 8vh, 76px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    scroll-margin: 80px;
   }
   .btn:hover,
-  .btn:focus-visible{
+  .btn:focus{
     background: #0b3a5a;
     border-color: #38bdf8;
     color: #fff;
+    transform: scale(1.04);
   }
-  .btn.go{ background: #0369a1; border-color: #0284c7; color: #fff; font-weight: 600; }
+  .btn.go{
+    background: #0369a1;
+    border-color: #0284c7;
+    color: #fff;
+  }
   .btn.go:hover,
-  .btn.go:focus-visible{ background: #0284c7; }
-  .btn.done{ background: #15803d; border-color: #22c55e; color: #fff; }
+  .btn.go:focus{ background: #0284c7; }
+  .btn.done{
+    background: #15803d;
+    border-color: #22c55e;
+    color: #fff;
+  }
 
   /* ---------- search ---------- */
   .search-box{
-    padding: clamp(12px, 1.4vh, 20px) clamp(12px, 1.2vw, 20px) clamp(6px, 0.8vh, 10px);
+    padding: clamp(20px, 2.4vh, 36px) clamp(20px, 2vw, 36px) clamp(12px, 1.4vh, 20px);
     display: flex;
     flex-direction: column;
-    gap: clamp(8px, 1vh, 14px);
+    gap: clamp(14px, 1.6vh, 22px);
     width: 100%;
   }
   .search-box input{
     width: 100%;
-    padding: clamp(12px, 1.3vh, 20px) clamp(14px, 1.3vw, 22px);
-    border-radius: clamp(8px, 0.7vw, 12px);
-    border: 1px solid #334155;
+    padding: clamp(18px, 2.4vh, 32px) clamp(20px, 2vw, 36px);
+    border-radius: clamp(10px, 0.8vw, 16px);
+    border: 2px solid #334155;
     background: #0f172a;
     color: #e2e8f0;
-    font-size: clamp(15px, 1.3vw, 20px);
+    font-size: clamp(18px, 1.6vw, 28px);
     outline: none;
     transition: .2s;
+    scroll-margin: 80px;
   }
-  .search-box input:focus{
-    border-color: #38bdf8;
-    box-shadow: 0 0 0 3px rgba(56,189,248,.22);
-  }
+  .search-box input:focus{ border-color: #38bdf8; }
   .search-box button{
     width: 100%;
-    padding: clamp(12px, 1.3vh, 20px) clamp(16px, 1.4vw, 24px);
+    padding: clamp(18px, 2.4vh, 32px) clamp(24px, 2.2vw, 44px);
     border: none;
-    border-radius: clamp(8px, 0.7vw, 12px);
+    border-radius: clamp(10px, 0.8vw, 16px);
     background: #0284c7;
     color: #fff;
-    font-size: clamp(15px, 1.3vw, 20px);
+    font-size: clamp(18px, 1.6vw, 26px);
     font-weight: 700;
     cursor: pointer;
     transition: .2s;
     outline: none;
+    min-height: clamp(60px, 9vh, 88px);
+    scroll-margin: 80px;
   }
   .search-box button:hover,
-  .search-box button:focus-visible{
+  .search-box button:focus{
     background: #0ea5e9;
-    box-shadow: 0 0 0 3px rgba(56,189,248,.35);
+    transform: scale(1.03);
   }
 
-  /* suggestions */
+  /* Wide screens: search input + button side-by-side (D-pad L/R navigation) */
+  @media (min-width: 900px){
+    .search-box{
+      flex-direction: row;
+      align-items: stretch;
+      gap: clamp(16px, 1.4vw, 24px);
+    }
+    .search-box input{ flex: 1; width: auto; }
+    .search-box button{
+      width: auto;
+      min-width: clamp(180px, 12vw, 280px);
+    }
+  }
+
+  /* ---------- suggestions ---------- */
   .suggestions{
     display: none;
-    padding: 0 clamp(12px, 1.2vw, 20px) clamp(6px, 0.8vh, 10px);
+    padding: 0 clamp(20px, 2vw, 36px) clamp(12px, 1.4vh, 20px);
     flex-direction: column;
-    gap: clamp(5px, 0.7vh, 10px);
+    gap: clamp(10px, 1.2vh, 16px);
   }
   .suggestions.show{ display: flex; }
   .suggestions .sug{
-    padding: clamp(10px, 1.1vh, 16px) clamp(14px, 1.2vw, 20px);
+    padding: clamp(16px, 2vh, 26px) clamp(20px, 1.8vw, 32px);
     background: #0f172a;
-    border: 1px solid #1e3a5f;
-    border-radius: clamp(7px, 0.6vw, 10px);
+    border: 2px solid #1e3a5f;
+    border-radius: clamp(10px, 0.8vw, 14px);
     color: #cbd5e1;
     cursor: pointer;
-    font-size: clamp(14px, 1.2vw, 18px);
+    font-size: clamp(16px, 1.4vw, 24px);
+    font-weight: 500;
     transition: .2s;
     outline: none;
+    min-height: clamp(52px, 7.5vh, 72px);
+    display: flex;
+    align-items: center;
+    scroll-margin: 80px;
   }
   .suggestions .sug:hover,
-  .suggestions .sug:focus-visible{
+  .suggestions .sug:focus{
     background: #0b3a5a;
     border-color: #38bdf8;
     color: #fff;
+    transform: translateX(6px);
   }
   .suggestions .sug b{ color: #7dd3fc; }
 
-  /* results */
+  /* ---------- search results ---------- */
   .search-results{
-    padding: clamp(6px, 0.8vh, 10px) clamp(12px, 1.2vw, 20px) clamp(12px, 1.4vh, 20px);
+    padding: clamp(12px, 1.4vh, 20px) clamp(20px, 2vw, 36px) clamp(20px, 2.4vh, 36px);
     display: flex;
     flex-direction: column;
-    gap: clamp(6px, 0.8vh, 10px);
+    gap: clamp(10px, 1.2vh, 16px);
   }
   .search-results a{
     display: block;
-    padding: clamp(10px, 1.1vh, 16px) clamp(14px, 1.2vw, 20px);
+    padding: clamp(16px, 2vh, 26px) clamp(20px, 1.8vw, 32px);
     background: #0f172a;
-    border: 1px solid #1e3a5f;
-    border-radius: clamp(8px, 0.7vw, 11px);
+    border: 2px solid #1e3a5f;
+    border-radius: clamp(10px, 0.8vw, 14px);
     color: #cbd5e1;
     text-decoration: none;
-    font-size: clamp(14px, 1.2vw, 18px);
+    font-size: clamp(16px, 1.4vw, 24px);
+    font-weight: 500;
     transition: .2s;
     outline: none;
+    min-height: clamp(56px, 8vh, 80px);
+    display: flex;
+    align-items: center;
+    scroll-margin: 80px;
   }
   .search-results a:hover,
-  .search-results a:focus-visible{
+  .search-results a:focus{
     background: #0b3a5a;
     border-color: #38bdf8;
     color: #fff;
+    transform: translateX(6px);
   }
   .search-results a b{ color: #7dd3fc; }
   .search-results .empty{
     color: #94a3b8;
-    font-size: clamp(13px, 1.1vw, 17px);
-    padding: clamp(8px, 1vh, 14px) 2px;
+    font-size: clamp(15px, 1.2vw, 20px);
+    padding: clamp(14px, 1.8vh, 24px) 4px;
     text-align: center;
   }
 
-  /* TV / large desktop boost */
-  @media (min-width: 1400px) {
-    body { font-size: 20px; }
-    .container { max-width: 1600px; }
+  /* ---------- boost on very large TV screens ---------- */
+  @media (min-width: 1800px){
+    body{ font-size: clamp(20px, 1.4vw, 28px); }
+    .container{ max-width: none; }
   }
-  @media (min-width: 1920px) {
-    body { font-size: 22px; }
-    .container { max-width: 1800px; }
+  @media (min-width: 2400px){
+    body{ font-size: 28px; }
   }
 </style>
 </head>
@@ -384,7 +429,6 @@
 
 <div class="container">
 
-  <!-- ================= CARD 1 : SEARCH (top, always open) ================= -->
   <section class="card always-open">
     <div class="card-header">
       <span class="icon">🔍</span>
@@ -401,7 +445,7 @@
       </div>
     </div>
   </section>
- <!-- ================= CARD 3 : a.js TEXT BOX (locked, click → inline toast) ================= -->
+
   <section class="card locked" id="aJsCard">
     <div class="card-header" id="aJsHeader" tabindex="0">
       <span class="icon">📄</span>
@@ -416,14 +460,12 @@
       <div class="text-list" id="textList"></div>
     </div>
   </section>
-  <!-- ================= CARD 2 : BOOKMARKS (TV-style app grid, static) ================= -->
+
   <section class="card static">
     <div class="panel">
       <div class="apps-grid" id="appsGrid"></div>
     </div>
   </section>
-
- 
 
 </div>
 
@@ -515,7 +557,6 @@ bookmarks.forEach(function (item) {
   var a = document.createElement('a');
   a.className = 'app-tile';
   a.href      = item.url;
-  /* Android TV: same-tab navigation (target=_blank removed) */
   a.rel       = 'noopener noreferrer';
   a.tabIndex  = 0;
   a.title     = item.name;
@@ -606,7 +647,6 @@ aTexts.forEach(function(txt){
     var go = document.createElement('a');
     go.className = 'btn go';
     go.href = txt;
-    /* Android TV: same-tab navigation */
     go.rel = 'noopener noreferrer';
     go.textContent = 'Go ↗';
     actions.appendChild(go);
@@ -652,7 +692,6 @@ function showSuggestions(){
     div.addEventListener('click', function(){
       searchInput.value = b.name;
       suggestionsEl.classList.remove('show');
-      /* Android TV: same-tab navigation */
       window.location.href = b.url;
     });
     div.addEventListener('keydown', function(e){
@@ -688,7 +727,6 @@ function showResults(){
   matches.forEach(function(b){
     var a = document.createElement('a');
     a.href = b.url;
-    /* Android TV: same-tab navigation */
     a.rel = 'noopener noreferrer';
     a.innerHTML = highlight(b.name, q);
     resultsEl.appendChild(a);
