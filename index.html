@@ -13,9 +13,9 @@
     min-height: 100vh;
     padding: clamp(24px, 3vw, 64px);
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    background: linear-gradient(135deg,#1e293b,#0f172a);
+    background: linear-gradient(135deg,#2a2540,#1a2338 55%,#1d2b3a);
     background-attachment: fixed;
-    color: #e2e8f0;
+    color: #e8ecf3;
     font-size: clamp(18px, 1.4vw, 26px);
     line-height: 1.45;
   }
@@ -30,10 +30,10 @@
   .search-results a:focus,
   .search-box button:focus,
   .search-box input:focus{
-    outline: 4px solid #38bdf8;
+    outline: 4px solid #7dd3fc;
     outline-offset: -4px;
-    box-shadow: 0 0 28px rgba(56,189,248,.55),
-                0 0 60px rgba(56,189,248,.25);
+    box-shadow: 0 0 28px rgba(125,211,252,.45),
+                0 0 60px rgba(125,211,252,.20);
     position: relative;
     z-index: 3;
   }
@@ -51,14 +51,14 @@
   /* ---------- card base ---------- */
   .card{
     position: relative;
-    background: #1e293b;
-    border: 1px solid #334155;
+    background: #272f45;
+    border: 1px solid #3b4664;
     border-radius: clamp(14px, 1vw, 22px);
     overflow: hidden;
-    box-shadow: 0 12px 32px rgba(0,0,0,.4);
+    box-shadow: 0 12px 32px rgba(0,0,0,.35);
     transition: border-color .25s;
   }
-  .card.open{ border-color: #38bdf8; }
+  .card.open{ border-color: #7dd3fc; }
 
   /* ---------- card header (BIG for TV) ---------- */
   .card-header{
@@ -66,15 +66,15 @@
     align-items: center;
     gap: clamp(16px, 1.6vw, 28px);
     padding: clamp(22px, 2.6vh, 40px) clamp(24px, 2.2vw, 44px);
-    background: #243449;
+    background: #2e3852;
     cursor: pointer;
     user-select: none;
     transition: background .2s;
     outline: none;
     min-height: clamp(76px, 12vh, 120px);
   }
-  .card-header:hover{ background: #2b3d55; }
-  .card-header:focus{ background: #2b3d55; }
+  .card-header:hover{ background: #364263; }
+  .card-header:focus{ background: #364263; }
 
   .card-header .icon{ font-size: clamp(22px, 2vw, 36px); }
   .card-header .title{
@@ -85,6 +85,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: #e8ecf3;
   }
   .card-header .lock{
     font-size: clamp(18px, 1.5vw, 26px);
@@ -92,7 +93,7 @@
   }
   .card-header .arrow{
     font-size: clamp(16px, 1.3vw, 22px);
-    color: #94a3b8;
+    color: #a8b3cc;
     transition: transform .3s;
   }
   .card.open .card-header .arrow{ transform: rotate(180deg); }
@@ -103,17 +104,17 @@
     overflow: hidden;
     opacity: 0;
     transition: max-height .35s ease, opacity .25s ease;
-    background: #0b3a5a;
+    background: #1d4a63;
   }
   .toast.show{
     max-height: 160px;
     opacity: 1;
-    border-top: 2px solid #38bdf8;
-    border-bottom: 2px solid #38bdf8;
+    border-top: 2px solid #7dd3fc;
+    border-bottom: 2px solid #7dd3fc;
   }
   .toast .toast-inner{
     padding: clamp(16px, 2vh, 28px) clamp(24px, 2.2vw, 44px);
-    color: #e0f2fe;
+    color: #d9f3ff;
     font-family: ui-monospace, Consolas, monospace;
     font-size: clamp(15px, 1.3vw, 22px);
     font-weight: 700;
@@ -139,7 +140,7 @@
   }
   .card.always-open .card-header,
   .card.always-open .card-header:hover{
-    background: #243449;
+    background: #2e3852;
     cursor: default;
   }
 
@@ -164,10 +165,10 @@
     gap: clamp(12px, 1.6vh, 20px);
     padding: clamp(18px, 2.2vh, 32px);
     border-radius: clamp(12px, 1vw, 20px);
-    background: #0f172a;
+    background: #222a40;
     border: 2px solid transparent;
     text-decoration: none;
-    color: #e2e8f0;
+    color: #e8ecf3;
     transition: transform .2s, background .2s, border-color .2s, box-shadow .2s;
     outline: none;
     cursor: pointer;
@@ -176,17 +177,17 @@
   }
   .app-tile:hover,
   .app-tile:focus{
-    background: #0b3a5a;
-    border-color: #38bdf8;
+    background: #1d4a63;
+    border-color: #7dd3fc;
     transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 14px 34px rgba(56,189,248,.35);
+    box-shadow: 0 14px 34px rgba(125,211,252,.28);
   }
 
   .app-icon{
     width: 100%;
     aspect-ratio: 1 / 1;
     border-radius: clamp(12px, 1vw, 20px);
-    background: #1e293b;
+    background: #2e3852;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -202,7 +203,7 @@
   .app-initial{
     font-size: clamp(36px, 3.4vw, 64px);
     font-weight: 800;
-    color: #7dd3fc;
+    color: #a5e8ff;
     letter-spacing: 1px;
   }
 
@@ -215,6 +216,7 @@
     text-overflow: ellipsis;
     max-width: 100%;
     letter-spacing: .3px;
+    color: #dde4f0;
   }
 
   /* ---------- a.js text rows ---------- */
@@ -225,8 +227,8 @@
     gap: clamp(14px, 1.6vh, 24px);
   }
   .text-row{
-    background: #0f172a;
-    border: 1px solid #1e3a5f;
+    background: #222a40;
+    border: 1px solid #3b4664;
     border-radius: clamp(10px, 0.8vw, 16px);
     padding: clamp(16px, 2vh, 28px);
     display: flex;
@@ -237,10 +239,10 @@
     font-family: ui-monospace, Consolas, monospace;
     font-size: clamp(14px, 1.2vw, 20px);
     line-height: 1.55;
-    color: #cbd5e1;
+    color: #c7d0e0;
     word-break: break-all;
   }
-  .text-row .txt.url{ color: #7dd3fc; }
+  .text-row .txt.url{ color: #a5e8ff; }
   .text-actions{
     display: flex;
     gap: clamp(12px, 1.2vw, 20px);
@@ -254,9 +256,9 @@
     font-weight: 600;
     padding: clamp(14px, 1.8vh, 24px) clamp(24px, 2.2vw, 40px);
     border-radius: clamp(8px, 0.6vw, 12px);
-    border: 2px solid #334155;
-    background: #1e293b;
-    color: #cbd5e1;
+    border: 2px solid #3b4664;
+    background: #2a3248;
+    color: #d0d8e6;
     cursor: pointer;
     text-decoration: none;
     transition: .2s;
@@ -269,22 +271,22 @@
   }
   .btn:hover,
   .btn:focus{
-    background: #0b3a5a;
-    border-color: #38bdf8;
-    color: #fff;
+    background: #1d4a63;
+    border-color: #7dd3fc;
+    color: #ffffff;
     transform: scale(1.04);
   }
   .btn.go{
-    background: #0369a1;
-    border-color: #0284c7;
-    color: #fff;
+    background: #2a6f9e;
+    border-color: #4a9fd1;
+    color: #ffffff;
   }
   .btn.go:hover,
-  .btn.go:focus{ background: #0284c7; }
+  .btn.go:focus{ background: #3687bd; }
   .btn.done{
-    background: #15803d;
-    border-color: #22c55e;
-    color: #fff;
+    background: #2f8a5c;
+    border-color: #4fb87a;
+    color: #ffffff;
   }
 
   /* ---------- search ---------- */
@@ -299,21 +301,21 @@
     width: 100%;
     padding: clamp(18px, 2.4vh, 32px) clamp(20px, 2vw, 36px);
     border-radius: clamp(10px, 0.8vw, 16px);
-    border: 2px solid #334155;
-    background: #0f172a;
-    color: #e2e8f0;
+    border: 2px solid #3b4664;
+    background: #222a40;
+    color: #e8ecf3;
     font-size: clamp(18px, 1.6vw, 28px);
     outline: none;
     transition: .2s;
     scroll-margin: 80px;
   }
-  .search-box input:focus{ border-color: #38bdf8; }
+  .search-box input:focus{ border-color: #7dd3fc; }
   .search-box button{
     width: 100%;
     padding: clamp(18px, 2.4vh, 32px) clamp(24px, 2.2vw, 44px);
     border: none;
     border-radius: clamp(10px, 0.8vw, 16px);
-    background: #0284c7;
+    background: #3a8bc4;
     color: #fff;
     font-size: clamp(18px, 1.6vw, 26px);
     font-weight: 700;
@@ -325,7 +327,7 @@
   }
   .search-box button:hover,
   .search-box button:focus{
-    background: #0ea5e9;
+    background: #4a9fd1;
     transform: scale(1.03);
   }
 
@@ -353,10 +355,10 @@
   .suggestions.show{ display: flex; }
   .suggestions .sug{
     padding: clamp(16px, 2vh, 26px) clamp(20px, 1.8vw, 32px);
-    background: #0f172a;
-    border: 2px solid #1e3a5f;
+    background: #222a40;
+    border: 2px solid #3b4664;
     border-radius: clamp(10px, 0.8vw, 14px);
-    color: #cbd5e1;
+    color: #d0d8e6;
     cursor: pointer;
     font-size: clamp(16px, 1.4vw, 24px);
     font-weight: 500;
@@ -369,12 +371,12 @@
   }
   .suggestions .sug:hover,
   .suggestions .sug:focus{
-    background: #0b3a5a;
-    border-color: #38bdf8;
-    color: #fff;
+    background: #1d4a63;
+    border-color: #7dd3fc;
+    color: #ffffff;
     transform: translateX(6px);
   }
-  .suggestions .sug b{ color: #7dd3fc; }
+  .suggestions .sug b{ color: #a5e8ff; }
 
   /* ---------- search results ---------- */
   .search-results{
@@ -386,10 +388,10 @@
   .search-results a{
     display: block;
     padding: clamp(16px, 2vh, 26px) clamp(20px, 1.8vw, 32px);
-    background: #0f172a;
-    border: 2px solid #1e3a5f;
+    background: #222a40;
+    border: 2px solid #3b4664;
     border-radius: clamp(10px, 0.8vw, 14px);
-    color: #cbd5e1;
+    color: #d0d8e6;
     text-decoration: none;
     font-size: clamp(16px, 1.4vw, 24px);
     font-weight: 500;
@@ -402,14 +404,14 @@
   }
   .search-results a:hover,
   .search-results a:focus{
-    background: #0b3a5a;
-    border-color: #38bdf8;
-    color: #fff;
+    background: #1d4a63;
+    border-color: #7dd3fc;
+    color: #ffffff;
     transform: translateX(6px);
   }
-  .search-results a b{ color: #7dd3fc; }
+  .search-results a b{ color: #a5e8ff; }
   .search-results .empty{
-    color: #94a3b8;
+    color: #9aa6bd;
     font-size: clamp(15px, 1.2vw, 20px);
     padding: clamp(14px, 1.8vh, 24px) 4px;
     text-align: center;
@@ -545,7 +547,7 @@ function getDomain(url) {
 }
 
 if (!bookmarks.length) {
-  appsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#94a3b8;padding:20px;">' +
+  appsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#9aa6bd;padding:20px;">' +
                        'b.js லோட் ஆகவில்லை அல்லது bookmarks காலியாக உள்ளது.' +
                        '</div>';
 }
